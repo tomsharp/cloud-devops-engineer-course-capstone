@@ -19,6 +19,7 @@ jobs:
       - image: docker
     steps:
       - checkout
+      - setup_remote_docker
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -34,6 +35,7 @@ jobs:
       - image: docker
     steps:
       - checkout
+      - setup_remote_docker
       - restore_cache:
           keys: [backend-build]
       - run:
