@@ -24,12 +24,16 @@ commands:
                   --parameters <<parameters.parameters>> \
                   --region=us-east-1 
               else
-                echo "Updating stack..."
-                # aws cloudformation update-stack \
-                #   --stack-name <<parameters.stack-name>> \
-                #   --template-body <<parameters.template-body>> \
-                #   --parameters <<parameters.parameters>> \
-                #   --region=us-east-1 
+                echo "Deleting stack ..."
+                aws cloudformation delete-stack \
+                  --stack-name <<parameters.stack-name>> 
+
+                echo "Creating stack..."
+                aws cloudformation create-stack \
+                  --stack-name <<parameters.stack-name>> \
+                  --template-body <<parameters.template-body>> \
+                  --parameters <<parameters.parameters>> \
+                  --region=us-east-1 
             fi
 
 jobs:
