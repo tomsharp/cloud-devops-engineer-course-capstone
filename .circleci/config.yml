@@ -20,8 +20,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - restore_cache:
-          keys: [backend-build]
+      - attach_workspace:
+          at: .
       - run:
           name: docker run
           command: |
@@ -36,8 +36,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - restore_cache:
-          keys: [backend-build]
+      - attach_workspace:
+          at: .
       - run:
           name: docker upload
           command: |
@@ -48,8 +48,8 @@ jobs:
       - image: amazon/aws-cli:latest
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-build]
+      - attach_workspace:
+          at: .
       - run:
           name: deploy network
           command: |
@@ -63,8 +63,8 @@ jobs:
       - image: amazon/aws-cli:latest
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-build]
+      - attach_workspace:
+          at: .
       - run:
           name: deploy network
           command: |
