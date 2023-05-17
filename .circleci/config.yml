@@ -6,10 +6,11 @@ jobs:
       - image: docker
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: docker build
           command: |
-            docker build -t capstone . --platform=linux/amd64
+            docker build -t capstone .
       - save_cache:
           paths: [cache]
           key: docker-build
