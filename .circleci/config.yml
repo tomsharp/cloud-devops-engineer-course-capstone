@@ -24,18 +24,13 @@ commands:
                   --parameters <<parameters.parameters>> \
                   --region=us-east-1 
               else
-                echo "Deleting stack ..."
-                aws cloudformation delete-stack \
-                  --stack-name <<parameters.stack-name>> 
-
-                aws cloudformation wait stack-delete-complete --stack-name <<parameters.stack-name>> 
-
-                echo "Creating stack..."
-                aws cloudformation create-stack \
+                echo "Updating stack..."
+                aws cloudformation update-stack \
                   --stack-name <<parameters.stack-name>> \
                   --template-body <<parameters.template-body>> \
                   --parameters <<parameters.parameters>> \
-                  --region=us-east-1 
+                  --region=us-east-1 \
+                  --parameter-overrides ParameterKey=WorkflowId,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7}
             fi
 
 jobs:
