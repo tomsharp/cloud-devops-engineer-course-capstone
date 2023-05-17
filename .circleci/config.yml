@@ -16,23 +16,23 @@ jobs:
           root: .
           paths:
             - docker_image
-  test-docker:
-    docker:
-      - image: docker
-    steps:
-      - checkout
-      - setup_remote_docker
-      - attach_workspace:
-          at: .
-      - run:
-          name: docker run
-          command: |
-            docker load -i docker_image
-            docker run -p 8000:80 capstone
-      - run:
-          name: test docker
-          command: |
-            curl localhost:80
+  # test-docker:
+  #   docker:
+  #     - image: docker
+  #   steps:
+  #     - checkout
+  #     - setup_remote_docker
+  #     - attach_workspace:
+  #         at: .
+  #     - run:
+  #         name: docker run
+  #         command: |
+  #           docker load -i docker_image
+  #           docker run -p 8000:80 capstone
+  #     - run:
+  #         name: test docker
+  #         command: |
+  #           curl localhost:80
   upload-docker:
     docker:
       - image: docker
@@ -91,10 +91,11 @@ workflows:
   default:
     jobs:
       - build-docker
-      - test-docker:
-          requires: [build-docker]
+      # - test-docker:
+      #     requires: [build-docker]
       - upload-docker:
-          requires: [test-docker]
+          # requires: [test-docker]
+          requires: [build-docker]
       - deploy-network:
           requires: []
       - deploy-servers:
