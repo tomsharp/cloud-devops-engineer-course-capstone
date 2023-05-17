@@ -75,10 +75,11 @@ workflows:
   default:
     jobs:
       - build-docker
-      - test-docker
+      - test-docker:
           requires: [build-docker]
-      - upload-docker
+      - upload-docker:
           requires: [test-docker]
-      - deploy-network
-      - deploy-servers
+      - deploy-network:
+          requires: []
+      - deploy-servers:
           requires: [upload-docker, deploy-network]
