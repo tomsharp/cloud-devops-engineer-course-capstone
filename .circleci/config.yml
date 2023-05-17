@@ -1,0 +1,84 @@
+version: 2.1
+
+jobs:
+  build-docker:
+    docker:
+      - image: python:3.11.3
+    steps:
+      - checkout
+      - run:
+          name: docker build
+          command: |
+            docker build -t capstone . --platform=linux/amd64
+      - save_cache:
+          paths: [cache]
+          key: docker-build
+  test-docker:
+    docker:
+      - image: python:3.11.3
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: docker run
+          command: |
+            docker run -p 8000:80 capstone
+      - run:
+          name: docker run
+          command: |
+            curl localhost:80
+  upload-docker:
+    docker:
+      - image: python:3.11.3
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: docker upload
+          command: |
+            docker tag capstone tomsharp12/capstone
+            docker push tomsharp12/capstone
+  deploy-network:
+    docker:
+      - image: amazon/aws-cli:latest
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: deploy network
+          command: |
+            aws cloudformation create-stack \
+              --stack-name udacity-capstone-network \
+              --template-body file://infra/network/network.yml \
+              --parameters file://infra/network/network.json \
+              --region=us-east-1 
+  deploy-servers:
+    docker:
+      - image: amazon/aws-cli:latest
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: deploy network
+          command: |
+            aws cloudformation create-stack \
+              --stack-name udacity-capstone-servers \
+              --template-body file://infra/servers/servers.yml \
+              --parameters file://infra/servers/servers.json \
+              --region=us-east-1 
+
+workflows:
+  default:
+    jobs:
+      - build-docker
+      - test-docker
+          requires: [build-docker]
+      - upload-docker
+          requires: [test-docker]
+      - deploy-network
+      - deploy-servers
+          requires: [upload-docker, deploy-network]

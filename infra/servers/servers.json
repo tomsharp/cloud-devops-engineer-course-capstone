@@ -1,0 +1,14 @@
+[
+	{
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "UdacityCapstone"
+	},
+	{
+		"ParameterKey": "MinServers",
+		"ParameterValue": "1"
+	},
+	{
+		"ParameterKey": "MaxServers",
+		"ParameterValue": "3"
+	}
+]
