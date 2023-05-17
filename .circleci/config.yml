@@ -16,23 +16,6 @@ jobs:
           root: .
           paths:
             - docker_image
-  # test-docker:
-  #   docker:
-  #     - image: docker
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker
-  #     - attach_workspace:
-  #         at: .
-  #     - run:
-  #         name: docker run
-  #         command: |
-  #           docker load -i docker_image
-  #           docker run -p 8000:80 capstone
-  #     - run:
-  #         name: test docker
-  #         command: |
-  #           curl localhost:80
   upload-docker:
     docker:
       - image: docker
@@ -46,6 +29,7 @@ jobs:
           command: |
             docker load -i docker_image
             docker tag capstone tomsharp12/capstone
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker push tomsharp12/capstone
   deploy-network:
     docker:
@@ -80,7 +64,6 @@ jobs:
       - run:
           name: deploy network
           command: |
-            yum -y install tar gzip
             aws cloudformation create-stack \
               --stack-name udacity-capstone-servers \
               --template-body file://infra/servers/servers.yml \
@@ -91,10 +74,7 @@ workflows:
   default:
     jobs:
       - build-docker
-      # - test-docker:
-      #     requires: [build-docker]
       - upload-docker:
-          # requires: [test-docker]
           requires: [build-docker]
       - deploy-network:
           requires: []
