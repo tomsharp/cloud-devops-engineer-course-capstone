@@ -11,9 +11,11 @@ jobs:
           name: docker build
           command: |
             docker build -t capstone .
-      - save_cache:
-          paths: [cache]
-          key: docker-build
+            docker save -o workspace/docker_image capstone
+      - persist_to_workspace:
+          paths:
+            - workspace/docker_image
+
   test-docker:
     docker:
       - image: docker
@@ -25,9 +27,10 @@ jobs:
       - run:
           name: docker run
           command: |
+            docker load -i workspace/docker_image
             docker run -p 8000:80 capstone
       - run:
-          name: docker run
+          name: test docker
           command: |
             curl localhost:80
   upload-docker:
