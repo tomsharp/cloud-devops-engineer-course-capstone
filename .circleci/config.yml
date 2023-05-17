@@ -14,7 +14,8 @@ commands:
       - run:
           name: create or update stack
           command: |
-            if ! aws cloudformation describe-stacks --stack-name <<parameters.stack-name>>
+            touch tmp.txt
+            if ! aws cloudformation describe-stacks --stack-name <<parameters.stack-name>> --output text > tmp.txt
               then 
                 echo "Creating stack..."
                 aws cloudformation create-stack \
