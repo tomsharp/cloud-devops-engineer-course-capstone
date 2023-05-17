@@ -28,6 +28,8 @@ commands:
                 aws cloudformation delete-stack \
                   --stack-name <<parameters.stack-name>> 
 
+                aws cloudformation wait stack-delete-complete --stack-name udacity-capstone-network
+
                 echo "Creating stack..."
                 aws cloudformation create-stack \
                   --stack-name <<parameters.stack-name>> \
