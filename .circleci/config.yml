@@ -1,5 +1,36 @@
 version: 2.1
 
+commands:
+  create-or-update-stack:
+    description: Create an AWS stack or update if it already exists.
+    parameters:
+      stack-name:
+        type: string
+      template-body:
+        type: string
+      parameters:
+        type: string
+    steps:
+      - run:
+          name: create or update stack
+          command: |
+            if ! aws cloudformation describe-stacks --stack-name <<parameters.stack-name>>
+              then 
+                echo "Creating stack..."
+                aws cloudformation create-stack \
+                  --stack-name <<parameters.stack-name>> \
+                  --template-body <<parameters.template-body>> \
+                  --parameters <<parameters.parameters>> \
+                  --region=us-east-1 
+              else
+                echo "Updating stack..."
+                aws cloudformation update-stack \
+                  --stack-name <<parameters.ID>> \
+                  --template-body <<parameters.template-body>> \
+                  --parameters <<parameters.parameters>> \
+                  --region=us-east-1 
+            fi
+
 jobs:
   build-docker:
     docker:
@@ -42,14 +73,18 @@ jobs:
             yum -y install tar gzip
       - attach_workspace:
           at: .
-      - run:
-          name: deploy network
-          command: |
-            aws cloudformation create-stack \
-              --stack-name udacity-capstone-network \
-              --template-body file://infra/network/network.yml \
-              --parameters file://infra/network/network.json \
-              --region=us-east-1 
+      - create-or-update-stack:
+          stack-name: udacity-capstone-servers
+          template-body: file://infra/servers/servers.yml
+          parameters: file://infra/servers/servers.json
+      # - run:
+      #     name: deploy network
+      #     command: |
+      #       aws cloudformation update-stack \
+      #         --stack-name udacity-capstone-network \
+      #         --template-body file://infra/network/network.yml \
+      #         --parameters file://infra/network/network.json \
+      #         --region=us-east-1 
   deploy-servers:
     docker:
       - image: amazon/aws-cli:latest
@@ -61,14 +96,33 @@ jobs:
             yum -y install tar gzip
       - attach_workspace:
           at: .
+      - create-or-update-stack:
+          stack-name: udacity-capstone-servers
+          template-body: file://infra/servers/servers.yml
+          parameters: file://infra/servers/servers.json
+      # - run:
+      #     name: deploy network
+      #     command: |
+      #       aws cloudformation update-stack \
+      #         --stack-name udacity-capstone-servers \
+      #         --template-body file://infra/servers/servers.yml \
+      #         --parameters file://infra/servers/servers.json \
+      #         --region=us-east-1 
+  deploy-app:
+    docker:
+      - image: docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: .
       - run:
-          name: deploy network
+          name: docker upload
           command: |
-            aws cloudformation create-stack \
-              --stack-name udacity-capstone-servers \
-              --template-body file://infra/servers/servers.yml \
-              --parameters file://infra/servers/servers.json \
-              --region=us-east-1 
+            docker load -i docker_image
+            docker tag capstone tomsharp12/capstone
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker push tomsharp12/capstone
 
 workflows:
   default:
@@ -80,3 +134,5 @@ workflows:
           requires: []
       - deploy-servers:
           requires: [upload-docker, deploy-network]
+      - deploy-app:
+          requires: [deploy-servers]
