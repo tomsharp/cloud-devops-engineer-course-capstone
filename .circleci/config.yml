@@ -25,7 +25,6 @@ commands:
                   --region=us-east-1 
               else
                 echo "Updating stack..."
-                
                 # aws cloudformation update-stack \
                 #   --stack-name <<parameters.stack-name>> \
                 #   --template-body <<parameters.template-body>> \
@@ -79,14 +78,6 @@ jobs:
           stack-name: udacity-capstone-servers
           template-body: file://infra/servers/servers.yml
           parameters: file://infra/servers/servers.json
-      # - run:
-      #     name: deploy network
-      #     command: |
-      #       aws cloudformation update-stack \
-      #         --stack-name udacity-capstone-network \
-      #         --template-body file://infra/network/network.yml \
-      #         --parameters file://infra/network/network.json \
-      #         --region=us-east-1 
   deploy-servers:
     docker:
       - image: amazon/aws-cli:latest
@@ -101,30 +92,21 @@ jobs:
       - create-or-update-stack:
           stack-name: udacity-capstone-servers
           template-body: file://infra/servers/servers.yml
-          parameters: file://infra/servers/servers.json
-      # - run:
-      #     name: deploy network
-      #     command: |
-      #       aws cloudformation update-stack \
-      #         --stack-name udacity-capstone-servers \
-      #         --template-body file://infra/servers/servers.yml \
-      #         --parameters file://infra/servers/servers.json \
-      #         --region=us-east-1 
-  deploy-app:
-    docker:
-      - image: docker
-    steps:
-      - checkout
-      - setup_remote_docker
-      - attach_workspace:
-          at: .
-      - run:
-          name: docker upload
-          command: |
-            docker load -i docker_image
-            docker tag capstone tomsharp12/capstone
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker push tomsharp12/capstone
+          parameters: file://infra/servers/servers.json 
+  # deploy-app:
+  #   docker:
+  #     - image: docker
+  #   steps:
+  #     - checkout
+  #     - setup_remote_docker
+  #     - run:
+  #         name: ssh
+  #         command: |
+  #           docker pull tomsharp12/capstone
+  #     - run:
+  #         name: docker pull
+  #         command: |
+  #           docker pull tomsharp12/capstone
 
 workflows:
   default:
@@ -136,5 +118,5 @@ workflows:
           requires: []
       - deploy-servers:
           requires: [upload-docker, deploy-network]
-      - deploy-app:
-          requires: [deploy-servers]
+      # - deploy-app:
+      #     requires: [deploy-servers]

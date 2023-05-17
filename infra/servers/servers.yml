@@ -64,7 +64,8 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           sudo apt-get update -y
-          # FIXME 
+          docker pull tomsharp12/capstone
+          docker run -p 8000:80 tomsharp12/capstone
       ImageId: ami-007855ac798b5175e
       SecurityGroups:
       - Ref: WebServerSecGroup
