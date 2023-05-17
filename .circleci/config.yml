@@ -25,7 +25,7 @@ commands:
               else
                 echo "Updating stack..."
                 aws cloudformation update-stack \
-                  --stack-name <<parameters.ID>> \
+                  --stack-name <<parameters.stack-name>> \
                   --template-body <<parameters.template-body>> \
                   --parameters <<parameters.parameters>> \
                   --region=us-east-1 
