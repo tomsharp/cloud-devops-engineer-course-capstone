@@ -79,9 +79,9 @@ jobs:
       - attach_workspace:
           at: .
       - create-or-update-stack:
-          stack-name: udacity-capstone-servers
-          template-body: file://infra/servers/servers.yml
-          parameters: file://infra/servers/servers.json
+          stack-name: udacity-capstone-network
+          template-body: file://infra/network/network.yml
+          parameters: file://infra/network/network.json
   deploy-servers:
     docker:
       - image: amazon/aws-cli:latest
