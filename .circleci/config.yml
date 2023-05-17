@@ -11,10 +11,11 @@ jobs:
           name: docker build
           command: |
             docker build -t capstone .
-            docker save -o workspace/docker_image capstone
+            docker save -o docker_image capstone
       - persist_to_workspace:
+          root: .
           paths:
-            - workspace/docker_image
+            - docker_image
 
   test-docker:
     docker:
