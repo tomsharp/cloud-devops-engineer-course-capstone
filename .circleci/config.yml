@@ -16,7 +16,6 @@ jobs:
           root: .
           paths:
             - docker_image
-
   test-docker:
     docker:
       - image: docker
@@ -28,7 +27,7 @@ jobs:
       - run:
           name: docker run
           command: |
-            docker load -i workspace/docker_image
+            docker load -i docker_image
             docker run -p 8000:80 capstone
       - run:
           name: test docker
@@ -45,6 +44,7 @@ jobs:
       - run:
           name: docker upload
           command: |
+            docker load -i docker_image
             docker tag capstone tomsharp12/capstone
             docker push tomsharp12/capstone
   deploy-network:
