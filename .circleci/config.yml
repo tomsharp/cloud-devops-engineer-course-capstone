@@ -52,12 +52,15 @@ jobs:
       - image: amazon/aws-cli:latest
     steps:
       - checkout
+      - run:
+          name: install tar gzip
+          command: |
+            yum -y install tar gzip
       - attach_workspace:
           at: .
       - run:
           name: deploy network
           command: |
-            yum -y install tar gzip
             aws cloudformation create-stack \
               --stack-name udacity-capstone-network \
               --template-body file://infra/network/network.yml \
@@ -68,6 +71,10 @@ jobs:
       - image: amazon/aws-cli:latest
     steps:
       - checkout
+      - run:
+          name: install tar gzip
+          command: |
+            yum -y install tar gzip
       - attach_workspace:
           at: .
       - run:
